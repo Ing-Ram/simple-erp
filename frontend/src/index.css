@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Numbers in tables and stat cards align and read as a ledger. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  @apply bg-neutral-50 text-neutral-900;
+}

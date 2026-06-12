@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: simple-erp
+  # Request handling is I/O bound; virtual threads are the simple, correct choice. No reactive stack.
+  threads:
+    virtual:
+      enabled: true
+  # Dev/test default: in-memory H2 in PostgreSQL-compatibility mode so Flyway SQL matches prod.
+  datasource:
+    url: jdbc:h2:mem:simpleerp;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: none              # Flyway owns the schema end to end; Hibernate never touches DDL.
+    open-in-view: false
+  flyway:
+    enabled: true
+    # Dev loads demo seed data alongside the schema; the prod profile drops db/seed below.
+    locations: classpath:db/migration,classpath:db/seed
+
+server:
+  port: 8080
+
+---
+# Production profile: PostgreSQL. Activate with SPRING_PROFILES_ACTIVE=prod.
+spring:
+  config:
+    activate:
+      on-profile: prod
+  flyway:
+    # Production never loads the demo seed — schema migrations only.
+    locations: classpath:db/migration
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/simpleerp}
+    username: ${DATABASE_USER:simpleerp}
+    password: ${DATABASE_PASSWORD:}

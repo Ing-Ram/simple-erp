@@ -1,0 +1,4 @@
+# Tests run against the schema only — never the dev demo seed — so aggregations start empty.
+spring:
+  flyway:
+    locations: classpath:db/migration
