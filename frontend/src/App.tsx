@@ -6,7 +6,9 @@ import { InvoicesPage } from "./modules/finance/InvoicesPage";
 import { InvoiceDetailPage } from "./modules/finance/InvoiceDetailPage";
 import { BillsPage } from "./modules/finance/BillsPage";
 import { BillDetailPage } from "./modules/finance/BillDetailPage";
+import { HrLayout } from "./modules/hr/HrLayout";
 import { HrDashboard } from "./modules/hr/Dashboard";
+import { RollCallPage } from "./modules/hr/RollCallPage";
 import { ModulePlaceholder } from "./components/ModulePlaceholder";
 
 const MODULES: { key: ModuleKey; label: string; path: string }[] = [
@@ -58,7 +60,10 @@ export function App() {
             <Route path="bills" element={<BillsPage />} />
             <Route path="bills/:id" element={<BillDetailPage />} />
           </Route>
-          <Route path="/hr" element={<HrDashboard />} />
+          <Route path="/hr" element={<HrLayout />}>
+            <Route index element={<HrDashboard />} />
+            <Route path="roll-call" element={<RollCallPage />} />
+          </Route>
           <Route path="/sales" element={<ModulePlaceholder module="Sales" />} />
           <Route path="/projects" element={<ModulePlaceholder module="Projects" />} />
         </Routes>

@@ -31,3 +31,45 @@ export interface PendingLeave {
   endDate: string;
   requestedOn: string;
 }
+
+export type WorkMode = "ON_SITE" | "REMOTE";
+
+export type AccountabilityStatus =
+  | "PRESENT"
+  | "CHECKED_OUT"
+  | "REMOTE"
+  | "ON_LEAVE"
+  | "UNACCOUNTED";
+
+/** Mirrors backend EmployeeResponse (used for the check-in selector). */
+export interface HrEmployee {
+  id: number;
+  name: string;
+  email: string | null;
+  departmentId: number | null;
+  departmentName: string | null;
+  position: string | null;
+  hireDate: string;
+  terminationDate: string | null;
+  status: "ACTIVE" | "ON_LEAVE" | "TERMINATED";
+}
+
+/** Mirrors backend RollCallEntry. */
+export interface RollCallEntry {
+  employeeId: number;
+  name: string;
+  department: string | null;
+  status: AccountabilityStatus;
+  since: string | null;
+}
+
+/** Mirrors backend RollCallResponse. */
+export interface RollCall {
+  asOf: string;
+  presentCount: number;
+  checkedOutCount: number;
+  remoteCount: number;
+  onLeaveCount: number;
+  unaccountedCount: number;
+  entries: RollCallEntry[];
+}

@@ -11,7 +11,11 @@ export const queryKeys = {
     customers: ["finance", "customers"] as const,
     vendors: ["finance", "vendors"] as const,
   },
-  hr: { dashboard: ["hr", "dashboard"] as const },
+  hr: {
+    dashboard: ["hr", "dashboard"] as const,
+    rollCall: ["hr", "roll-call"] as const,
+    employees: ["hr", "employees"] as const,
+  },
   sales: { dashboard: ["sales", "dashboard"] as const },
   projects: { dashboard: ["projects", "dashboard"] as const },
 };

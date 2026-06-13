@@ -12,6 +12,7 @@ delete from bills;
 delete from customers;
 delete from vendors;
 -- HR: break the department↔employee cycle before deleting.
+delete from building_presence;
 delete from leave_requests;
 update departments set manager_id = null;
 delete from employees;
@@ -100,6 +101,14 @@ insert into leave_requests
     (4, 4, 'PARENTAL', date '2026-06-20', date '2026-06-27', 'APPROVED', 'HR', timestamp '2026-06-02 09:00:00', timestamp '2026-06-02 09:00:00', timestamp '2026-06-02 09:00:00'),
     (5, 1, 'VACATION', date '2026-03-01', date '2026-03-05', 'APPROVED', 'HR', timestamp '2026-02-20 09:00:00', timestamp '2026-02-20 09:00:00', timestamp '2026-02-20 09:00:00');
 
+-- Building presence today: Alice present, Bob checked out, Grace remote. Erin is on leave;
+-- Carol and Dan have no check-in, so the roll-call shows them UNACCOUNTED. Uses current_timestamp
+-- so these always count as "today" on a fresh start.
+insert into building_presence (id, employee_id, work_mode, check_in_at, check_out_at, created_at, updated_at) values
+    (1, 1, 'ON_SITE', current_timestamp, null,              current_timestamp, current_timestamp),
+    (2, 2, 'ON_SITE', current_timestamp, current_timestamp, current_timestamp, current_timestamp),
+    (3, 7, 'REMOTE',  current_timestamp, null,              current_timestamp, current_timestamp);
+
 -- Advance identity sequences past the seeded ids so app-created rows don't collide.
 alter table customers      alter column id restart with 100;
 alter table vendors        alter column id restart with 100;
@@ -109,6 +118,7 @@ alter table payments       alter column id restart with 100;
 alter table bills          alter column id restart with 100;
 alter table bill_lines     alter column id restart with 100;
 alter table bill_payments  alter column id restart with 100;
-alter table departments    alter column id restart with 100;
-alter table employees      alter column id restart with 100;
-alter table leave_requests alter column id restart with 100;
+alter table departments       alter column id restart with 100;
+alter table employees         alter column id restart with 100;
+alter table leave_requests    alter column id restart with 100;
+alter table building_presence alter column id restart with 100;

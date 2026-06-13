@@ -18,3 +18,7 @@ export function percent(ratio: number): string {
 export function count(n: number): string {
   return new Intl.NumberFormat("en-US").format(n);
 }
+
+export function clockTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+}
