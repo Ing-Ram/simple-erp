@@ -11,6 +11,9 @@ frontend/dist/
 .idea/
 .vscode/
 
+# Local dev launcher
+start.sh
+
 # Convention-checker output (erp-builder-tests/run_checks.py)
 grading.json
 
