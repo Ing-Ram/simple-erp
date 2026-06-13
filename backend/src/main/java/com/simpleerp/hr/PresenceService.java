@@ -54,6 +54,20 @@ public class PresenceService {
     }
 
     /**
+     * Closes every still-open check-in, flagging each as auto-checked-out. Run at end of day so a
+     * forgotten check-in doesn't linger as PRESENT into the next day; returns how many were closed.
+     */
+    public int autoCheckOutOpen() {
+        Instant now = Instant.now();
+        List<BuildingPresence> open = presence.findByCheckOutAtIsNull();
+        for (BuildingPresence record : open) {
+            record.setCheckOutAt(now);
+            record.setAutoCheckedOut(true);
+        }
+        return open.size();
+    }
+
+    /**
      * Reconciles every active employee into an accountability status as of now. Presence wins over
      * excused absence so anyone physically on site is never overlooked.
      */

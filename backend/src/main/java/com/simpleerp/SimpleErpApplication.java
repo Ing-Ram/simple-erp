@@ -2,9 +2,11 @@ package com.simpleerp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /** Entry point for the SimpleERP modular-monolith backend. */
 @SpringBootApplication
+@EnableScheduling
 public class SimpleErpApplication {
 
     /** Boots the Spring application context. */

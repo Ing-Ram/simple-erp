@@ -54,6 +54,21 @@ class RollCallSmokeTest {
         assertThat(roll.entries()).hasSize(5);
     }
 
+    @Test
+    void endOfDaySweepClosesForgottenCheckIns() {
+        Long dept = departments.create(new DepartmentRequest("Engineering", null)).id();
+        Long forgot = hire(dept, "Forgot Fran");
+        presence.checkIn(new CheckInRequest(forgot, WorkMode.ON_SITE));
+        assertThat(presence.rollCall().presentCount()).isEqualTo(1);
+
+        int closed = presence.autoCheckOutOpen();
+
+        assertThat(closed).isEqualTo(1);
+        var roll = presence.rollCall();
+        assertThat(roll.presentCount()).isZero();
+        assertThat(roll.checkedOutCount()).isEqualTo(1);
+    }
+
     private Long hire(Long deptId, String name) {
         return employees.create(new EmployeeRequest(
                 name, null, deptId, "Engineer", LocalDate.now().minusMonths(6),

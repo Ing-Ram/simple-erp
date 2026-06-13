@@ -11,7 +11,8 @@ public record PresenceResponse(
         String employeeName,
         WorkMode workMode,
         Instant checkInAt,
-        Instant checkOutAt) {
+        Instant checkOutAt,
+        boolean autoCheckedOut) {
 
     /** Maps an entity to its response shape; the single home for this mapping. */
     public static PresenceResponse from(BuildingPresence p) {
@@ -21,6 +22,7 @@ public record PresenceResponse(
                 p.getEmployee().getName(),
                 p.getWorkMode(),
                 p.getCheckInAt(),
-                p.getCheckOutAt());
+                p.getCheckOutAt(),
+                p.isAutoCheckedOut());
     }
 }

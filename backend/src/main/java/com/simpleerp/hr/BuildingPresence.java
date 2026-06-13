@@ -30,6 +30,9 @@ public class BuildingPresence extends AuditableEntity {
     /** Null while the employee is still checked in. */
     private Instant checkOutAt;
 
+    /** True when the end-of-day sweep closed this record because the employee never checked out. */
+    private boolean autoCheckedOut = false;
+
     /** True when this is an on-site check-in with no check-out yet — i.e. in the building now. */
     public boolean isOnSiteOpen() {
         return workMode == WorkMode.ON_SITE && checkOutAt == null;
@@ -65,5 +68,13 @@ public class BuildingPresence extends AuditableEntity {
 
     public void setCheckOutAt(Instant checkOutAt) {
         this.checkOutAt = checkOutAt;
+    }
+
+    public boolean isAutoCheckedOut() {
+        return autoCheckedOut;
+    }
+
+    public void setAutoCheckedOut(boolean autoCheckedOut) {
+        this.autoCheckedOut = autoCheckedOut;
     }
 }

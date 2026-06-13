@@ -13,4 +13,7 @@ public interface BuildingPresenceRepository extends JpaRepository<BuildingPresen
 
     /** The employee's most recent still-open check-in, if any — what a check-out closes. */
     Optional<BuildingPresence> findFirstByEmployee_IdAndCheckOutAtIsNullOrderByCheckInAtDesc(Long employeeId);
+
+    /** All still-open check-ins — what the end-of-day sweep closes. */
+    List<BuildingPresence> findByCheckOutAtIsNull();
 }
