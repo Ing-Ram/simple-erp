@@ -16,6 +16,10 @@ export const queryKeys = {
     rollCall: ["hr", "roll-call"] as const,
     employees: ["hr", "employees"] as const,
   },
-  sales: { dashboard: ["sales", "dashboard"] as const },
+  sales: {
+    dashboard: ["sales", "dashboard"] as const,
+    reps: ["sales", "reps"] as const,
+    closedDeals: (ownerId: number | "all") => ["sales", "closed-deals", ownerId] as const,
+  },
   projects: { dashboard: ["projects", "dashboard"] as const },
 };

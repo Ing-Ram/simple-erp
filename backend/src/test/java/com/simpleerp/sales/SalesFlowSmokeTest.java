@@ -34,6 +34,7 @@ class SalesFlowSmokeTest {
     @Autowired private OpportunityService opportunities;
     @Autowired private SalesOrderService orders;
     @Autowired private SalesDashboardService dashboard;
+    @Autowired private SalesRepService reps;
 
     @Test
     void winningThenInvoicingAnOrderCreatesAnArInvoice() {
@@ -65,5 +66,17 @@ class SalesFlowSmokeTest {
 
         // The won deal shows up in this quarter's number.
         assertThat(dashboard.summary().wonThisQuarter()).isEqualByComparingTo("50000.00");
+
+        // And it is attributed to the owning salesperson, both in the rollup and the closed list.
+        var rep = reps.performance().stream().filter(r -> r.employeeId().equals(ownerId)).findFirst();
+        assertThat(rep).isPresent();
+        assertThat(rep.get().wonCount()).isEqualTo(1);
+        assertThat(rep.get().wonValue()).isEqualByComparingTo("50000.00");
+        assertThat(rep.get().winRate()).isEqualTo(1.0);
+
+        var closed = opportunities.closedDeals(ownerId);
+        assertThat(closed).hasSize(1);
+        assertThat(closed.get(0).stage()).isEqualTo(OpportunityStage.WON);
+        assertThat(closed.get(0).ownerEmployeeId()).isEqualTo(ownerId);
     }
 }

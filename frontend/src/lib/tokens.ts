@@ -41,6 +41,9 @@ const statusTone: Record<string, Tone> = {
   REMOTE: "neutral",
   ON_LEAVE: "warning",
   UNACCOUNTED: "negative",
+  // Sales opportunity outcomes.
+  WON: "positive",
+  LOST: "negative",
 };
 
 /** Resolves a status string to its tone, defaulting to neutral for unknown values. */

@@ -68,4 +68,33 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
 
     /** Open opportunities past their expected close date — money sitting still. */
     List<Opportunity> findByStageInAndExpectedCloseDateBefore(List<OpportunityStage> stages, LocalDate date);
+
+    /** Closed deals (won and lost), most recently closed first. */
+    List<Opportunity> findByStageInOrderByClosedDateDesc(List<OpportunityStage> stages);
+
+    /** One salesperson's closed deals, most recently closed first. */
+    List<Opportunity> findByStageInAndOwnerEmployeeIdOrderByClosedDateDesc(
+            List<OpportunityStage> stages, Long ownerEmployeeId);
+
+    /**
+     * Per-salesperson rollup in one grouped query: won count and value, lost count, and open
+     * weighted pipeline (×100). Conditional aggregation keeps it to a single pass over the table.
+     */
+    @Query("""
+            select new com.simpleerp.sales.RepRollupRow(
+                o.ownerEmployeeId,
+                sum(case when o.stage = com.simpleerp.sales.OpportunityStage.WON then 1L else 0L end),
+                coalesce(sum(case when o.stage = com.simpleerp.sales.OpportunityStage.WON
+                                  then o.expectedValue.amount else 0 end), 0),
+                sum(case when o.stage = com.simpleerp.sales.OpportunityStage.LOST then 1L else 0L end),
+                coalesce(sum(case when o.stage in (com.simpleerp.sales.OpportunityStage.PROSPECTING,
+                                                   com.simpleerp.sales.OpportunityStage.QUALIFIED,
+                                                   com.simpleerp.sales.OpportunityStage.PROPOSAL,
+                                                   com.simpleerp.sales.OpportunityStage.NEGOTIATION)
+                                  then o.expectedValue.amount * o.probability else 0 end), 0))
+            from Opportunity o
+            group by o.ownerEmployeeId
+            """)
+    List<RepRollupRow> repRollup();
 }
+

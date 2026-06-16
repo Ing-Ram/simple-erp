@@ -142,6 +142,19 @@ public class OpportunityService {
         return toResponse(load(id));
     }
 
+    /**
+     * Closed deals (won and lost), most recently closed first, optionally for a single salesperson.
+     * Each row carries full detail — customer, owner, value, close date, and the reason if lost.
+     */
+    @Transactional(readOnly = true)
+    public List<OpportunityResponse> closedDeals(Long ownerEmployeeId) {
+        List<OpportunityStage> closed = List.of(OpportunityStage.WON, OpportunityStage.LOST);
+        List<Opportunity> deals = ownerEmployeeId == null
+                ? opportunities.findByStageInOrderByClosedDateDesc(closed)
+                : opportunities.findByStageInAndOwnerEmployeeIdOrderByClosedDateDesc(closed, ownerEmployeeId);
+        return deals.stream().map(this::toResponse).toList();
+    }
+
     private Opportunity load(Long id) {
         return opportunities.findById(id).orElseThrow(() -> new NotFoundException("Opportunity", id));
     }

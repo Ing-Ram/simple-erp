@@ -27,3 +27,41 @@ export interface NeedsAttentionRow {
   amount: number;
   date: string;
 }
+
+export type OpportunityStage =
+  | "PROSPECTING"
+  | "QUALIFIED"
+  | "PROPOSAL"
+  | "NEGOTIATION"
+  | "WON"
+  | "LOST";
+
+/** Mirrors backend OpportunityResponse (used for the closed-deals list). */
+export interface Opportunity {
+  id: number;
+  customerId: number;
+  customerName: string;
+  ownerEmployeeId: number;
+  ownerName: string;
+  expectedValue: number;
+  weightedValue: number;
+  currency: string;
+  probability: number;
+  expectedCloseDate: string;
+  stage: OpportunityStage;
+  lostReason: string | null;
+  closedDate: string | null;
+  salesOrderId: number | null;
+}
+
+/** Mirrors backend RepPerformanceResponse. */
+export interface RepPerformance {
+  employeeId: number;
+  name: string;
+  wonCount: number;
+  wonValue: number;
+  averageDealSize: number;
+  lostCount: number;
+  winRate: number;
+  openPipelineWeighted: number;
+}
