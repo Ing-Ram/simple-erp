@@ -62,4 +62,20 @@ class HrModuleSmokeTest {
         assertThat(afterApprove.whosOut()).hasSize(1);
         assertThat(employees.get(empId).status()).isEqualTo(EmployeeStatus.ON_LEAVE);
     }
+
+    @Test
+    void leaveRequestsListReturnsAllAndFiltersByStatus() {
+        Long deptId = departments.create(new DepartmentRequest("Engineering", null)).id();
+        Long empId = employees.create(new EmployeeRequest(
+                "Bob Martinez", "bob@simpleerp.example", deptId, "Engineer",
+                LocalDate.now().minusDays(30), new BigDecimal("110000.00"), "USD")).id();
+        Long reqId = leave.submit(new LeaveRequestRequest(
+                empId, com.simpleerp.hr.LeaveType.SICK,
+                LocalDate.now().plusDays(5), LocalDate.now().plusDays(6))).id();
+
+        // The submitted request appears in the full list and the PENDING filter, not in APPROVED.
+        assertThat(leave.list(null)).extracting("id").containsExactly(reqId);
+        assertThat(leave.list(LeaveStatus.PENDING)).extracting("id").containsExactly(reqId);
+        assertThat(leave.list(LeaveStatus.APPROVED)).isEmpty();
+    }
 }
