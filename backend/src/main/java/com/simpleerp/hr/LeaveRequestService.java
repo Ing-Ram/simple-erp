@@ -7,6 +7,7 @@ import com.simpleerp.shared.NotFoundException;
 import com.simpleerp.shared.ValidationException;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,6 +87,15 @@ public class LeaveRequestService {
                     throw new InvalidStateException("Cannot cancel leave in status " + leave.getStatus());
         }
         return LeaveRequestResponse.from(leave);
+    }
+
+    /** All leave requests (or just one status), newest first, for the management list. */
+    @Transactional(readOnly = true)
+    public List<LeaveRequestResponse> list(LeaveStatus status) {
+        List<LeaveRequest> found = status == null
+                ? requests.findAllByOrderByCreatedAtDesc()
+                : requests.findByStatusOrderByCreatedAtDesc(status);
+        return found.stream().map(LeaveRequestResponse::from).toList();
     }
 
     /** Records a decision: sets status, reviewer (defaulting to "HR"), and the decided timestamp. */

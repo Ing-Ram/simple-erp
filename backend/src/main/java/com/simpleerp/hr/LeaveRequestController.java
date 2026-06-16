@@ -5,11 +5,14 @@ import com.simpleerp.hr.dto.LeaveRequestRequest;
 import com.simpleerp.hr.dto.LeaveRequestResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /** REST endpoints for the leave workflow: submit, approve, reject, cancel. */
@@ -21,6 +24,12 @@ public class LeaveRequestController {
 
     public LeaveRequestController(LeaveRequestService service) {
         this.service = service;
+    }
+
+    /** Lists leave requests, newest first; optionally filtered to one status. */
+    @GetMapping
+    public List<LeaveRequestResponse> list(@RequestParam(required = false) LeaveStatus status) {
+        return service.list(status);
     }
 
     /** Submits a leave request and returns 201 with its location. */

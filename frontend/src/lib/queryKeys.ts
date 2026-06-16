@@ -15,6 +15,8 @@ export const queryKeys = {
     dashboard: ["hr", "dashboard"] as const,
     rollCall: ["hr", "roll-call"] as const,
     employees: ["hr", "employees"] as const,
+    departments: ["hr", "departments"] as const,
+    leaveRequests: ["hr", "leave-requests"] as const,
   },
   sales: {
     dashboard: ["sales", "dashboard"] as const,

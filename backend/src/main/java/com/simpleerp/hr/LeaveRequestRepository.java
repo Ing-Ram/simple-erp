@@ -12,6 +12,12 @@ public interface LeaveRequestRepository extends JpaRepository<LeaveRequest, Long
     /** Count of requests in a given status (e.g. PENDING for the KPI). */
     long countByStatus(LeaveStatus status);
 
+    /** All requests, newest first, for the management list. */
+    List<LeaveRequest> findAllByOrderByCreatedAtDesc();
+
+    /** Requests in one status, newest first. */
+    List<LeaveRequest> findByStatusOrderByCreatedAtDesc(LeaveStatus status);
+
     /** Pending requests as dashboard rows, oldest first so the longest-waiting surface at the top. */
     @Query("""
             select new com.simpleerp.hr.PendingLeave(
