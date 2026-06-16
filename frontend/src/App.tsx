@@ -9,6 +9,7 @@ import { BillDetailPage } from "./modules/finance/BillDetailPage";
 import { HrLayout } from "./modules/hr/HrLayout";
 import { HrDashboard } from "./modules/hr/Dashboard";
 import { RollCallPage } from "./modules/hr/RollCallPage";
+import { SalesDashboard } from "./modules/sales/Dashboard";
 import { ModulePlaceholder } from "./components/ModulePlaceholder";
 
 const MODULES: { key: ModuleKey; label: string; path: string }[] = [
@@ -64,7 +65,7 @@ export function App() {
             <Route index element={<HrDashboard />} />
             <Route path="roll-call" element={<RollCallPage />} />
           </Route>
-          <Route path="/sales" element={<ModulePlaceholder module="Sales" />} />
+          <Route path="/sales" element={<SalesDashboard />} />
           <Route path="/projects" element={<ModulePlaceholder module="Projects" />} />
         </Routes>
       </main>
