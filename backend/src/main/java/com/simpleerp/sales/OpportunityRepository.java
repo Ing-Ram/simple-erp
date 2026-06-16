@@ -77,16 +77,20 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
             List<OpportunityStage> stages, Long ownerEmployeeId);
 
     /**
-     * Per-salesperson rollup in one grouped query: won count and value, lost count, and open
-     * weighted pipeline (×100). Conditional aggregation keeps it to a single pass over the table.
+     * Per-salesperson rollup in one grouped query: won count and value and lost count counted only
+     * for deals closed on or after {@code since} (null = all time), plus the current open weighted
+     * pipeline (×100, never date-bound). Conditional aggregation keeps it to a single pass.
      */
     @Query("""
             select new com.simpleerp.sales.RepRollupRow(
                 o.ownerEmployeeId,
-                sum(case when o.stage = com.simpleerp.sales.OpportunityStage.WON then 1L else 0L end),
+                sum(case when o.stage = com.simpleerp.sales.OpportunityStage.WON
+                          and (:since is null or o.closedDate >= :since) then 1L else 0L end),
                 coalesce(sum(case when o.stage = com.simpleerp.sales.OpportunityStage.WON
+                          and (:since is null or o.closedDate >= :since)
                                   then o.expectedValue.amount else 0 end), 0),
-                sum(case when o.stage = com.simpleerp.sales.OpportunityStage.LOST then 1L else 0L end),
+                sum(case when o.stage = com.simpleerp.sales.OpportunityStage.LOST
+                          and (:since is null or o.closedDate >= :since) then 1L else 0L end),
                 coalesce(sum(case when o.stage in (com.simpleerp.sales.OpportunityStage.PROSPECTING,
                                                    com.simpleerp.sales.OpportunityStage.QUALIFIED,
                                                    com.simpleerp.sales.OpportunityStage.PROPOSAL,
@@ -95,6 +99,6 @@ public interface OpportunityRepository extends JpaRepository<Opportunity, Long> 
             from Opportunity o
             group by o.ownerEmployeeId
             """)
-    List<RepRollupRow> repRollup();
+    List<RepRollupRow> repRollup(@Param("since") LocalDate since);
 }
 

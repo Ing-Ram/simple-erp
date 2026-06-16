@@ -4,6 +4,7 @@ import com.simpleerp.hr.EmployeeService;
 import com.simpleerp.sales.dto.RepPerformanceResponse;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,13 @@ public class SalesRepService {
         this.employees = employees;
     }
 
-    /** Each salesperson with at least one opportunity, ranked by won value descending. */
-    public List<RepPerformanceResponse> performance() {
-        return opportunities.repRollup().stream()
+    /**
+     * Each salesperson with at least one opportunity, ranked by won value descending. Won/lost
+     * figures count deals closed on or after {@code since} (null = all time); open pipeline is
+     * always the current snapshot.
+     */
+    public List<RepPerformanceResponse> performance(LocalDate since) {
+        return opportunities.repRollup(since).stream()
                 .map(this::toResponse)
                 .sorted(Comparator.comparing(RepPerformanceResponse::wonValue).reversed())
                 .toList();

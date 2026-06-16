@@ -68,7 +68,7 @@ class SalesFlowSmokeTest {
         assertThat(dashboard.summary().wonThisQuarter()).isEqualByComparingTo("50000.00");
 
         // And it is attributed to the owning salesperson, both in the rollup and the closed list.
-        var rep = reps.performance().stream().filter(r -> r.employeeId().equals(ownerId)).findFirst();
+        var rep = reps.performance(null).stream().filter(r -> r.employeeId().equals(ownerId)).findFirst();
         assertThat(rep).isPresent();
         assertThat(rep.get().wonCount()).isEqualTo(1);
         assertThat(rep.get().wonValue()).isEqualByComparingTo("50000.00");
@@ -78,5 +78,11 @@ class SalesFlowSmokeTest {
         assertThat(closed).hasSize(1);
         assertThat(closed.get(0).stage()).isEqualTo(OpportunityStage.WON);
         assertThat(closed.get(0).ownerEmployeeId()).isEqualTo(ownerId);
+
+        // A period starting tomorrow excludes today's win from the won figures.
+        var future = reps.performance(LocalDate.now().plusDays(1)).stream()
+                .filter(r -> r.employeeId().equals(ownerId)).findFirst().orElseThrow();
+        assertThat(future.wonCount()).isZero();
+        assertThat(future.wonValue()).isEqualByComparingTo("0");
     }
 }

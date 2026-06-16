@@ -54,6 +54,9 @@ export interface Opportunity {
   salesOrderId: number | null;
 }
 
+/** Period scope for the salesperson leaderboard's won/lost figures. */
+export type RepPeriod = "all" | "quarter" | "last90";
+
 /** Mirrors backend RepPerformanceResponse. */
 export interface RepPerformance {
   employeeId: number;

@@ -1,13 +1,13 @@
 import { api } from "../../lib/api";
-import type { Opportunity, RepPerformance, SalesDashboard } from "./types";
+import type { Opportunity, RepPerformance, RepPeriod, SalesDashboard } from "./types";
 
 /** Typed endpoint functions for the Sales module. */
 export function fetchSalesDashboard(): Promise<SalesDashboard> {
   return api.get<SalesDashboard>("/api/v1/sales/dashboard");
 }
 
-export function fetchReps(): Promise<RepPerformance[]> {
-  return api.get<RepPerformance[]>("/api/v1/sales/reps");
+export function fetchReps(period: RepPeriod = "all"): Promise<RepPerformance[]> {
+  return api.get<RepPerformance[]>(`/api/v1/sales/reps?period=${period}`);
 }
 
 export function fetchClosedDeals(ownerEmployeeId?: number): Promise<Opportunity[]> {

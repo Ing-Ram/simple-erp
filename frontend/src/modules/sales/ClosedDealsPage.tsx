@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { queryKeys } from "../../lib/queryKeys";
 import { money, shortDate } from "../../lib/format";
@@ -13,9 +14,15 @@ import { fetchClosedDeals, fetchReps } from "./api";
 
 /** Closed deals (won and lost) with full detail, filterable by salesperson. */
 export function ClosedDealsPage() {
-  const [owner, setOwner] = useState<number | "all">("all");
+  // An ?owner= query param (e.g. from the leaderboard) preselects the salesperson filter.
+  const [searchParams] = useSearchParams();
+  const ownerParam = searchParams.get("owner");
+  const [owner, setOwner] = useState<number | "all">(ownerParam ? Number(ownerParam) : "all");
 
-  const { data: reps } = useQuery({ queryKey: queryKeys.sales.reps, queryFn: fetchReps });
+  const { data: reps } = useQuery({
+    queryKey: queryKeys.sales.reps("all"),
+    queryFn: () => fetchReps("all"),
+  });
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: queryKeys.sales.closedDeals(owner),
     queryFn: () => fetchClosedDeals(owner === "all" ? undefined : owner),
