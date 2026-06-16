@@ -17,6 +17,11 @@ delete from leave_requests;
 update departments set manager_id = null;
 delete from employees;
 delete from departments;
+-- Sales (children before parents).
+delete from sales_order_lines;
+delete from sales_orders;
+delete from opportunities;
+delete from leads;
 
 -- Customers (AR) --------------------------------------------------------------
 insert into customers (id, name, email, payment_terms_days, active, created_at, updated_at) values
@@ -109,6 +114,31 @@ insert into building_presence (id, employee_id, work_mode, check_in_at, check_ou
     (2, 2, 'ON_SITE', current_timestamp, current_timestamp, current_timestamp, current_timestamp),
     (3, 7, 'REMOTE',  current_timestamp, null,              current_timestamp, current_timestamp);
 
+-- Sales: leads, opportunities (open + won + lost + stale), orders. Owners are employees 3 & 4;
+-- customers are 1 (Acme), 2 (Globex), 3 (Initech). Dates anchored around 2026-06-16.
+insert into leads (id, name, company, email, source, status, customer_id, opportunity_id, created_at, updated_at) values
+    (1, 'Jane Prospect', 'NewCo',   'jane@newco.example',  'WEBSITE',  'NEW',          null, null, timestamp '2026-06-08 09:00:00', timestamp '2026-06-08 09:00:00'),
+    (2, 'Sam Buyer',     'BigCorp', 'sam@bigcorp.example', 'REFERRAL', 'CONTACTED',     null, null, timestamp '2026-06-11 09:00:00', timestamp '2026-06-11 09:00:00'),
+    (3, 'Old Lead',      'DeadCo',  'x@deadco.example',    'OUTBOUND', 'DISQUALIFIED',  null, null, timestamp '2026-05-02 09:00:00', timestamp '2026-05-05 09:00:00');
+
+insert into opportunities
+    (id, customer_id, owner_employee_id, expected_value_amount, expected_value_currency, probability,
+     expected_close_date, stage, previous_stage, closed_date, lost_reason, sales_order_id, created_at, updated_at) values
+    (1, 1, 4, 50000.0000, 'USD', 60, date '2026-07-15', 'PROPOSAL',    null,       null,            null,          null, timestamp '2026-05-20 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (2, 2, 3, 30000.0000, 'USD', 40, date '2026-06-30', 'QUALIFIED',   null,       null,            null,          null, timestamp '2026-06-02 09:00:00', timestamp '2026-06-02 09:00:00'),
+    (3, 3, 4, 80000.0000, 'USD', 80, date '2026-06-10', 'NEGOTIATION', null,       null,            null,          null, timestamp '2026-04-15 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (4, 1, 3, 45000.0000, 'USD', 100, date '2026-06-01', 'WON',        null,       date '2026-06-05', null,         1,    timestamp '2026-04-01 09:00:00', timestamp '2026-06-05 09:00:00'),
+    (5, 2, 4, 20000.0000, 'USD', 0,  date '2026-05-15', 'LOST',        'PROPOSAL', date '2026-05-20', 'Budget cut', null, timestamp '2026-03-10 09:00:00', timestamp '2026-05-20 09:00:00'),
+    (6, 3, 3, 60000.0000, 'USD', 100, date '2026-04-05', 'WON',        null,       date '2026-04-10', null,         2,    timestamp '2026-02-20 09:00:00', timestamp '2026-04-10 09:00:00');
+
+insert into sales_orders (id, customer_id, owner_employee_id, status, order_date, opportunity_id, invoice_id, created_at, updated_at) values
+    (1, 1, 3, 'FULFILLED', date '2026-06-05', 4, null, timestamp '2026-06-05 09:00:00', timestamp '2026-06-12 09:00:00'),
+    (2, 3, 3, 'OPEN',      date '2026-04-10', 6, null, timestamp '2026-04-10 09:00:00', timestamp '2026-04-10 09:00:00');
+
+insert into sales_order_lines (id, order_id, description, quantity, unit_price_amount, unit_price_currency, created_at, updated_at) values
+    (1, 1, 'Won opportunity #4', 1, 45000.0000, 'USD', timestamp '2026-06-05 09:00:00', timestamp '2026-06-05 09:00:00'),
+    (2, 2, 'Won opportunity #6', 1, 60000.0000, 'USD', timestamp '2026-04-10 09:00:00', timestamp '2026-04-10 09:00:00');
+
 -- Advance identity sequences past the seeded ids so app-created rows don't collide.
 alter table customers      alter column id restart with 100;
 alter table vendors        alter column id restart with 100;
@@ -122,3 +152,7 @@ alter table departments       alter column id restart with 100;
 alter table employees         alter column id restart with 100;
 alter table leave_requests    alter column id restart with 100;
 alter table building_presence alter column id restart with 100;
+alter table leads             alter column id restart with 100;
+alter table opportunities     alter column id restart with 100;
+alter table sales_orders      alter column id restart with 100;
+alter table sales_order_lines alter column id restart with 100;

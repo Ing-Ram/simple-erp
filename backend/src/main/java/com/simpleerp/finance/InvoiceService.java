@@ -53,6 +53,32 @@ public class InvoiceService {
         return toResponse(invoices.save(invoice));
     }
 
+    /**
+     * Raises an AR invoice from a fulfilled sales order: copies the order lines, links the order,
+     * takes terms from the customer (due = issue + payment terms), and starts at SENT since the work
+     * is already delivered. The cross-module entry point Sales calls; returns the new invoice id.
+     */
+    public Long createFromOrder(SalesOrderInvoiceData data) {
+        Customer customer = customers.findById(data.customerId())
+                .orElseThrow(() -> new NotFoundException("Customer", data.customerId()));
+        Invoice invoice = new Invoice();
+        invoice.setCustomer(customer);
+        invoice.setSalesOrderId(data.salesOrderId());
+        LocalDate today = LocalDate.now();
+        invoice.setIssueDate(today);
+        invoice.setDueDate(today.plusDays(customer.getPaymentTermsDays()));
+        invoice.setStatus(InvoiceStatus.SENT);
+        data.lines().forEach(l -> {
+            InvoiceLine line = new InvoiceLine();
+            line.setInvoice(invoice);
+            line.setDescription(l.description());
+            line.setQuantity(l.quantity());
+            line.setUnitPrice(new Money(l.unitPrice(), l.currency()));
+            invoice.getLines().add(line);
+        });
+        return invoices.save(invoice).getId();
+    }
+
     /** Marks a DRAFT invoice as SENT; the exhaustive switch makes new states a compile error. */
     public InvoiceResponse send(Long id) {
         Invoice invoice = load(id);
