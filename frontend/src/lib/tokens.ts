@@ -35,6 +35,12 @@ const statusTone: Record<string, Tone> = {
   APPROVED: "positive",
   VOID: "neutral",
   OVERDUE: "negative",
+  // Emergency roll-call accountability statuses.
+  PRESENT: "positive",
+  CHECKED_OUT: "neutral",
+  REMOTE: "neutral",
+  ON_LEAVE: "warning",
+  UNACCOUNTED: "negative",
 };
 
 /** Resolves a status string to its tone, defaulting to neutral for unknown values. */

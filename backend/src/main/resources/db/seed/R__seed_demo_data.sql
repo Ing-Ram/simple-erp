@@ -11,6 +11,12 @@ delete from invoices;
 delete from bills;
 delete from customers;
 delete from vendors;
+-- HR: break the department↔employee cycle before deleting.
+delete from building_presence;
+delete from leave_requests;
+update departments set manager_id = null;
+delete from employees;
+delete from departments;
 
 -- Customers (AR) --------------------------------------------------------------
 insert into customers (id, name, email, payment_terms_days, active, created_at, updated_at) values
@@ -63,12 +69,56 @@ insert into bill_payments (id, bill_id, amount_amount, amount_currency, payment_
     (1, 3,  500.0000, 'USD', date '2026-05-25', 'BANK_TRANSFER', timestamp '2026-05-25 09:00:00', timestamp '2026-05-25 09:00:00'),
     (2, 4,  600.0000, 'USD', date '2026-06-01', 'CHECK',         timestamp '2026-06-01 09:00:00', timestamp '2026-06-01 09:00:00');
 
+-- HR: departments (managers assigned after employees exist) ------------------
+insert into departments (id, name, manager_id, created_at, updated_at) values
+    (1, 'Engineering', null, timestamp '2026-01-02 09:00:00', timestamp '2026-01-02 09:00:00'),
+    (2, 'Sales',       null, timestamp '2026-01-02 09:00:00', timestamp '2026-01-02 09:00:00'),
+    (3, 'Operations',  null, timestamp '2026-01-02 09:00:00', timestamp '2026-01-02 09:00:00');
+
+-- Employees: 6 active + 1 terminated (turnover). Carol & Grace are hires in the last 90 days.
+insert into employees
+    (id, name, email, department_id, position, hire_date, termination_date,
+     salary_amount, salary_currency, status, created_at, updated_at) values
+    (1, 'Alice Chen',     'alice@simpleerp.example',  1, 'Engineering Manager', date '2024-03-01', null, 145000.0000, 'USD', 'ACTIVE',     timestamp '2024-03-01 09:00:00', timestamp '2024-03-01 09:00:00'),
+    (2, 'Bob Martinez',   'bob@simpleerp.example',    1, 'Senior Engineer',     date '2025-11-15', null, 120000.0000, 'USD', 'ACTIVE',     timestamp '2025-11-15 09:00:00', timestamp '2025-11-15 09:00:00'),
+    (3, 'Carol Diaz',     'carol@simpleerp.example',  2, 'Account Executive',   date '2026-04-20', null,  98000.0000, 'USD', 'ACTIVE',     timestamp '2026-04-20 09:00:00', timestamp '2026-04-20 09:00:00'),
+    (4, 'Dan Wright',     'dan@simpleerp.example',    2, 'Sales Manager',       date '2023-06-01', null, 110000.0000, 'USD', 'ACTIVE',     timestamp '2023-06-01 09:00:00', timestamp '2023-06-01 09:00:00'),
+    (5, 'Erin Park',      'erin@simpleerp.example',   3, 'Operations Manager',  date '2022-01-10', null,  88000.0000, 'USD', 'ACTIVE',     timestamp '2022-01-10 09:00:00', timestamp '2022-01-10 09:00:00'),
+    (6, 'Frank Lee',      'frank@simpleerp.example',  3, 'Operations Analyst',  date '2021-09-01', date '2026-02-15', 92000.0000, 'USD', 'TERMINATED', timestamp '2021-09-01 09:00:00', timestamp '2026-02-15 09:00:00'),
+    (7, 'Grace Kim',      'grace@simpleerp.example',  1, 'Engineer',            date '2026-05-02', null, 105000.0000, 'USD', 'ACTIVE',     timestamp '2026-05-02 09:00:00', timestamp '2026-05-02 09:00:00');
+
+-- Assign department managers now that the employees exist.
+update departments set manager_id = 1 where id = 1;
+update departments set manager_id = 4 where id = 2;
+update departments set manager_id = 5 where id = 3;
+
+-- Leave requests: 2 pending (needs attention), 2 approved in the next 14 days (who's out).
+insert into leave_requests
+    (id, employee_id, type, start_date, end_date, status, reviewer, decided_at, created_at, updated_at) values
+    (1, 2, 'VACATION', date '2026-06-22', date '2026-06-26', 'PENDING',  null, null, timestamp '2026-06-05 09:00:00', timestamp '2026-06-05 09:00:00'),
+    (2, 3, 'SICK',     date '2026-06-15', date '2026-06-16', 'PENDING',  null, null, timestamp '2026-06-10 09:00:00', timestamp '2026-06-10 09:00:00'),
+    (3, 5, 'VACATION', date '2026-06-10', date '2026-06-16', 'APPROVED', 'HR', timestamp '2026-06-01 09:00:00', timestamp '2026-06-01 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (4, 4, 'PARENTAL', date '2026-06-20', date '2026-06-27', 'APPROVED', 'HR', timestamp '2026-06-02 09:00:00', timestamp '2026-06-02 09:00:00', timestamp '2026-06-02 09:00:00'),
+    (5, 1, 'VACATION', date '2026-03-01', date '2026-03-05', 'APPROVED', 'HR', timestamp '2026-02-20 09:00:00', timestamp '2026-02-20 09:00:00', timestamp '2026-02-20 09:00:00');
+
+-- Building presence today: Alice present, Bob checked out, Grace remote. Erin is on leave;
+-- Carol and Dan have no check-in, so the roll-call shows them UNACCOUNTED. Uses current_timestamp
+-- so these always count as "today" on a fresh start.
+insert into building_presence (id, employee_id, work_mode, check_in_at, check_out_at, created_at, updated_at) values
+    (1, 1, 'ON_SITE', current_timestamp, null,              current_timestamp, current_timestamp),
+    (2, 2, 'ON_SITE', current_timestamp, current_timestamp, current_timestamp, current_timestamp),
+    (3, 7, 'REMOTE',  current_timestamp, null,              current_timestamp, current_timestamp);
+
 -- Advance identity sequences past the seeded ids so app-created rows don't collide.
-alter table customers     alter column id restart with 100;
-alter table vendors       alter column id restart with 100;
-alter table invoices      alter column id restart with 100;
-alter table invoice_lines alter column id restart with 100;
-alter table payments      alter column id restart with 100;
-alter table bills         alter column id restart with 100;
-alter table bill_lines    alter column id restart with 100;
-alter table bill_payments alter column id restart with 100;
+alter table customers      alter column id restart with 100;
+alter table vendors        alter column id restart with 100;
+alter table invoices       alter column id restart with 100;
+alter table invoice_lines  alter column id restart with 100;
+alter table payments       alter column id restart with 100;
+alter table bills          alter column id restart with 100;
+alter table bill_lines     alter column id restart with 100;
+alter table bill_payments  alter column id restart with 100;
+alter table departments       alter column id restart with 100;
+alter table employees         alter column id restart with 100;
+alter table leave_requests    alter column id restart with 100;
+alter table building_presence alter column id restart with 100;
