@@ -4,6 +4,8 @@ const TABS = [
   { label: "Dashboard", to: "/finance", end: true },
   { label: "Invoices", to: "/finance/invoices", end: false },
   { label: "Bills", to: "/finance/bills", end: false },
+  { label: "Customers", to: "/finance/customers", end: false },
+  { label: "Vendors", to: "/finance/vendors", end: false },
 ];
 
 /** Finance module shell: a sub-nav of Dashboard / Invoices / Bills above the routed page. */

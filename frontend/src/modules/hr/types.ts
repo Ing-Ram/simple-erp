@@ -63,6 +63,56 @@ export interface RollCallEntry {
   since: string | null;
 }
 
+export type LeaveType = "VACATION" | "SICK" | "UNPAID" | "PARENTAL";
+export type LeaveStatus = "PENDING" | "APPROVED" | "REJECTED" | "CANCELLED";
+
+/** Mirrors backend DepartmentResponse. */
+export interface Department {
+  id: number;
+  name: string;
+  managerId: number | null;
+  managerName: string | null;
+}
+
+/** Mirrors backend LeaveRequestResponse. */
+export interface LeaveRequest {
+  id: number;
+  employeeId: number;
+  employeeName: string;
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+  businessDays: number;
+  status: LeaveStatus;
+  reviewer: string | null;
+  decidedAt: string | null;
+}
+
+/** Payload for hiring an employee. */
+export interface EmployeeRequest {
+  name: string;
+  email: string;
+  departmentId: number;
+  position: string;
+  hireDate: string;
+  salary: number;
+  currency: string;
+}
+
+/** Payload for creating a department. */
+export interface DepartmentRequest {
+  name: string;
+  managerId: number | null;
+}
+
+/** Payload for submitting a leave request. */
+export interface LeaveRequestRequest {
+  employeeId: number;
+  type: LeaveType;
+  startDate: string;
+  endDate: string;
+}
+
 /** Mirrors backend RollCallResponse. */
 export interface RollCall {
   asOf: string;

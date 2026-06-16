@@ -7,6 +7,7 @@ import type {
   Invoice,
   InvoiceRequest,
   Paged,
+  PartyRequest,
   PaymentRecord,
   PaymentRequest,
   Vendor,
@@ -84,6 +85,14 @@ export function fetchCustomers(): Promise<Customer[]> {
   return api.get<Customer[]>("/api/v1/finance/customers");
 }
 
+export function createCustomer(body: PartyRequest): Promise<Customer> {
+  return api.post<Customer>("/api/v1/finance/customers", body);
+}
+
 export function fetchVendors(): Promise<Vendor[]> {
   return api.get<Vendor[]>("/api/v1/finance/vendors");
+}
+
+export function createVendor(body: PartyRequest): Promise<Vendor> {
+  return api.post<Vendor>("/api/v1/finance/vendors", body);
 }

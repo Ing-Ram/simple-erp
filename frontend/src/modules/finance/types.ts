@@ -83,6 +83,13 @@ export interface Customer {
   active: boolean;
 }
 
+/** Payload for creating a customer or vendor (CustomerRequest / VendorRequest share a shape). */
+export interface PartyRequest {
+  name: string;
+  email: string;
+  paymentTermsDays: number;
+}
+
 /** Mirrors backend VendorResponse. */
 export interface Vendor {
   id: number;

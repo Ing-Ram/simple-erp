@@ -6,8 +6,12 @@ import { InvoicesPage } from "./modules/finance/InvoicesPage";
 import { InvoiceDetailPage } from "./modules/finance/InvoiceDetailPage";
 import { BillsPage } from "./modules/finance/BillsPage";
 import { BillDetailPage } from "./modules/finance/BillDetailPage";
+import { PartiesPage } from "./modules/finance/PartiesPage";
 import { HrLayout } from "./modules/hr/HrLayout";
 import { HrDashboard } from "./modules/hr/Dashboard";
+import { EmployeesPage } from "./modules/hr/EmployeesPage";
+import { DepartmentsPage } from "./modules/hr/DepartmentsPage";
+import { LeaveRequestsPage } from "./modules/hr/LeaveRequestsPage";
 import { RollCallPage } from "./modules/hr/RollCallPage";
 import { SalesLayout } from "./modules/sales/SalesLayout";
 import { SalesDashboard } from "./modules/sales/Dashboard";
@@ -66,9 +70,14 @@ export function App() {
             <Route path="invoices/:id" element={<InvoiceDetailPage />} />
             <Route path="bills" element={<BillsPage />} />
             <Route path="bills/:id" element={<BillDetailPage />} />
+            <Route path="customers" element={<PartiesPage kind="customers" />} />
+            <Route path="vendors" element={<PartiesPage kind="vendors" />} />
           </Route>
           <Route path="/hr" element={<HrLayout />}>
             <Route index element={<HrDashboard />} />
+            <Route path="employees" element={<EmployeesPage />} />
+            <Route path="departments" element={<DepartmentsPage />} />
+            <Route path="leave" element={<LeaveRequestsPage />} />
             <Route path="roll-call" element={<RollCallPage />} />
           </Route>
           <Route path="/sales" element={<SalesLayout />}>
