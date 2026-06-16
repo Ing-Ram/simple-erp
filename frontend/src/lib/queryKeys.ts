@@ -18,6 +18,9 @@ export const queryKeys = {
   },
   sales: {
     dashboard: ["sales", "dashboard"] as const,
+    leads: ["sales", "leads"] as const,
+    opportunities: ["sales", "opportunities"] as const,
+    orders: ["sales", "orders"] as const,
     reps: (period: string) => ["sales", "reps", period] as const,
     closedDeals: (ownerId: number | "all") => ["sales", "closed-deals", ownerId] as const,
   },

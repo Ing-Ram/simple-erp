@@ -2,6 +2,9 @@ import { NavLink, Outlet } from "react-router-dom";
 
 const TABS = [
   { label: "Dashboard", to: "/sales", end: true },
+  { label: "Leads", to: "/sales/leads", end: false },
+  { label: "Opportunities", to: "/sales/opportunities", end: false },
+  { label: "Orders", to: "/sales/orders", end: false },
   { label: "Salespeople", to: "/sales/reps", end: false },
   { label: "Closed deals", to: "/sales/closed", end: false },
 ];

@@ -44,6 +44,16 @@ const statusTone: Record<string, Tone> = {
   // Sales opportunity outcomes.
   WON: "positive",
   LOST: "negative",
+  // Sales lead statuses.
+  NEW: "neutral",
+  CONTACTED: "neutral",
+  QUALIFIED: "positive",
+  DISQUALIFIED: "negative",
+  // Sales order statuses.
+  OPEN: "neutral",
+  FULFILLED: "warning",
+  INVOICED: "positive",
+  CANCELLED: "negative",
 };
 
 /** Resolves a status string to its tone, defaulting to neutral for unknown values. */

@@ -11,6 +11,9 @@ import { HrDashboard } from "./modules/hr/Dashboard";
 import { RollCallPage } from "./modules/hr/RollCallPage";
 import { SalesLayout } from "./modules/sales/SalesLayout";
 import { SalesDashboard } from "./modules/sales/Dashboard";
+import { LeadsPage } from "./modules/sales/LeadsPage";
+import { OpportunitiesPage } from "./modules/sales/OpportunitiesPage";
+import { OrdersPage } from "./modules/sales/OrdersPage";
 import { RepsPage } from "./modules/sales/RepsPage";
 import { ClosedDealsPage } from "./modules/sales/ClosedDealsPage";
 import { ModulePlaceholder } from "./components/ModulePlaceholder";
@@ -70,6 +73,9 @@ export function App() {
           </Route>
           <Route path="/sales" element={<SalesLayout />}>
             <Route index element={<SalesDashboard />} />
+            <Route path="leads" element={<LeadsPage />} />
+            <Route path="opportunities" element={<OpportunitiesPage />} />
+            <Route path="orders" element={<OrdersPage />} />
             <Route path="reps" element={<RepsPage />} />
             <Route path="closed" element={<ClosedDealsPage />} />
           </Route>

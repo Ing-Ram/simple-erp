@@ -36,6 +36,66 @@ export type OpportunityStage =
   | "WON"
   | "LOST";
 
+export type LeadSource = "REFERRAL" | "WEBSITE" | "OUTBOUND" | "EVENT";
+export type LeadStatus = "NEW" | "CONTACTED" | "QUALIFIED" | "DISQUALIFIED";
+export type OrderStatus = "OPEN" | "FULFILLED" | "INVOICED" | "CANCELLED";
+
+/** Mirrors backend LeadResponse. */
+export interface Lead {
+  id: number;
+  name: string;
+  company: string | null;
+  email: string | null;
+  source: LeadSource;
+  status: LeadStatus;
+  customerId: number | null;
+  opportunityId: number | null;
+}
+
+/** Mirrors backend SalesOrderResponse. */
+export interface SalesOrder {
+  id: number;
+  customerId: number;
+  customerName: string;
+  ownerEmployeeId: number;
+  ownerName: string;
+  status: OrderStatus;
+  orderDate: string;
+  opportunityId: number | null;
+  invoiceId: number | null;
+  total: number;
+  currency: string;
+  lines: { id: number; description: string; quantity: number; unitPrice: number }[];
+}
+
+/** Payload for POST /sales/leads. */
+export interface LeadRequest {
+  name: string;
+  company: string;
+  email: string;
+  source: LeadSource;
+}
+
+/** Payload for qualifying a lead. */
+export interface QualifyLeadRequest {
+  ownerEmployeeId: number;
+  expectedValue: number;
+  currency: string;
+  probability: number;
+  expectedCloseDate: string;
+  paymentTermsDays: number;
+}
+
+/** Payload for POST /sales/opportunities. */
+export interface OpportunityRequest {
+  customerId: number;
+  ownerEmployeeId: number;
+  expectedValue: number;
+  currency: string;
+  probability: number;
+  expectedCloseDate: string;
+}
+
 /** Mirrors backend OpportunityResponse (used for the closed-deals list). */
 export interface Opportunity {
   id: number;
