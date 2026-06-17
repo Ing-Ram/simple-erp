@@ -20,7 +20,7 @@ import { OpportunitiesPage } from "./modules/sales/OpportunitiesPage";
 import { OrdersPage } from "./modules/sales/OrdersPage";
 import { RepsPage } from "./modules/sales/RepsPage";
 import { ClosedDealsPage } from "./modules/sales/ClosedDealsPage";
-import { ModulePlaceholder } from "./components/ModulePlaceholder";
+import { ProjectsDashboard } from "./modules/projects/Dashboard";
 
 const MODULES: { key: ModuleKey; label: string; path: string }[] = [
   { key: "finance", label: "Finance", path: "/finance" },
@@ -88,7 +88,7 @@ export function App() {
             <Route path="reps" element={<RepsPage />} />
             <Route path="closed" element={<ClosedDealsPage />} />
           </Route>
-          <Route path="/projects" element={<ModulePlaceholder module="Projects" />} />
+          <Route path="/projects" element={<ProjectsDashboard />} />
         </Routes>
       </main>
     </div>

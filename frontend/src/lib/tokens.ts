@@ -54,6 +54,10 @@ const statusTone: Record<string, Tone> = {
   FULFILLED: "warning",
   INVOICED: "positive",
   CANCELLED: "negative",
+  // Projects budget health.
+  ON_TRACK: "positive",
+  AT_RISK: "warning",
+  OVER: "negative",
 };
 
 /** Resolves a status string to its tone, defaulting to neutral for unknown values. */
