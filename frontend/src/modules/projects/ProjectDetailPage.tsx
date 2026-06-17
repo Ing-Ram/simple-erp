@@ -21,6 +21,7 @@ import {
   fetchMilestones,
   fetchProject,
   fetchTasks,
+  fetchTimeEntries,
   logTime,
   waiveMilestone,
 } from "./api";
@@ -36,6 +37,7 @@ export function ProjectDetailPage() {
   const [showNewTask, setShowNewTask] = useState(false);
   const [showNewMilestone, setShowNewMilestone] = useState(false);
   const [logTask, setLogTask] = useState<Task | null>(null);
+  const [viewTimeTask, setViewTimeTask] = useState<Task | null>(null);
 
   const project = useQuery({ queryKey: queryKeys.projects.project(id), queryFn: () => fetchProject(id) });
   const tasks = useQuery({ queryKey: queryKeys.projects.tasks(id), queryFn: () => fetchTasks(id) });
@@ -52,6 +54,7 @@ export function ProjectDetailPage() {
     qc.invalidateQueries({ queryKey: queryKeys.projects.milestones(id) });
     qc.invalidateQueries({ queryKey: queryKeys.projects.list });
     qc.invalidateQueries({ queryKey: queryKeys.projects.dashboard });
+    qc.invalidateQueries({ queryKey: ["projects", "time-entries"] });
   };
 
   const taskStatus = useMutation({
@@ -144,13 +147,21 @@ export function ProjectDetailPage() {
                 header: "",
                 align: "right",
                 cell: (t) => (
-                  <button
-                    className="text-sm font-medium text-projects hover:underline disabled:text-neutral-300"
-                    disabled={p.status === "COMPLETED" || p.status === "CANCELLED"}
-                    onClick={() => setLogTask(t)}
-                  >
-                    Log time
-                  </button>
+                  <div className="flex justify-end gap-3 text-sm font-medium">
+                    <button
+                      className="text-neutral-600 hover:underline"
+                      onClick={() => setViewTimeTask((cur) => (cur?.id === t.id ? null : t))}
+                    >
+                      {viewTimeTask?.id === t.id ? "Hide time" : "View time"}
+                    </button>
+                    <button
+                      className="text-projects hover:underline disabled:text-neutral-300"
+                      disabled={p.status === "COMPLETED" || p.status === "CANCELLED"}
+                      onClick={() => setLogTask(t)}
+                    >
+                      Log time
+                    </button>
+                  </div>
                 ),
               },
             ]}
@@ -159,6 +170,8 @@ export function ProjectDetailPage() {
           <EmptyState title="No tasks yet" action="Add a task to start logging work." />
         )}
       </DashboardCard>
+
+      {viewTimeTask && <TimeEntriesCard task={viewTimeTask} />}
 
       <DashboardCard title="Milestones">
         <div className="mb-3 flex justify-end">
@@ -222,6 +235,44 @@ function Field({ label, value, emphasize }: { label: string; value: string; emph
         {value}
       </dd>
     </div>
+  );
+}
+
+/** Read-only list of time logged against one task, with the running total. */
+function TimeEntriesCard({ task }: { task: Task }) {
+  const entries = useQuery({
+    queryKey: queryKeys.projects.timeEntries(task.id),
+    queryFn: () => fetchTimeEntries(task.id),
+  });
+
+  if (entries.isError) {
+    return <ErrorState message="Time entries didn't load." onRetry={entries.refetch} />;
+  }
+  const rows = entries.data ?? [];
+  const totalHours = rows.reduce((sum, e) => sum + e.hours, 0);
+
+  return (
+    <DashboardCard title={`Time logged — ${task.title}`}>
+      {rows.length === 0 ? (
+        <EmptyState title="No time logged" action="Use “Log time” on the task to record hours." />
+      ) : (
+        <>
+          <DataTable
+            rows={rows}
+            rowKey={(e) => e.id}
+            columns={[
+              { header: "Date", cell: (e) => shortDate(e.entryDate) },
+              { header: "Who", cell: (e) => e.employeeName },
+              { header: "Note", cell: (e) => e.note ?? "—" },
+              { header: "Hours", align: "right", cell: (e) => e.hours.toFixed(2) },
+            ]}
+          />
+          <p className="mt-3 text-right text-sm text-neutral-500">
+            Total <span className="font-semibold tabular-nums text-neutral-900">{totalHours.toFixed(2)} h</span>
+          </p>
+        </>
+      )}
+    </DashboardCard>
   );
 }
 

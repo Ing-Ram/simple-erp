@@ -18,7 +18,12 @@ export function RollCallPage() {
   const [employeeId, setEmployeeId] = useState<number | "">("");
   const [workMode, setWorkMode] = useState<WorkMode>("ON_SITE");
 
-  const roll = useQuery({ queryKey: queryKeys.hr.rollCall, queryFn: fetchRollCall });
+  // Poll every 15s so a live muster stays current during an incident without manual refreshes.
+  const roll = useQuery({
+    queryKey: queryKeys.hr.rollCall,
+    queryFn: fetchRollCall,
+    refetchInterval: 15_000,
+  });
   const { data: employees } = useQuery({ queryKey: queryKeys.hr.employees, queryFn: fetchEmployees });
 
   const refresh = () => qc.invalidateQueries({ queryKey: queryKeys.hr.rollCall });
@@ -41,9 +46,10 @@ export function RollCallPage() {
         <PageHeader module="Roll Call" asOf={new Date(data.asOf)} />
         <button
           onClick={refresh}
-          className="rounded border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50"
+          disabled={roll.isFetching}
+          className="rounded border border-neutral-300 px-3 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
         >
-          Refresh
+          {roll.isFetching ? "Refreshing…" : "Refresh"}
         </button>
       </div>
 

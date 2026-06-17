@@ -26,6 +26,7 @@ export function ProjectsDashboard() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: queryKeys.projects.dashboard,
     queryFn: fetchProjectsDashboard,
+    refetchInterval: 60_000,
   });
 
   if (isPending) return <DashboardSkeleton />;

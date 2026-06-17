@@ -31,6 +31,7 @@ export function SalesDashboard() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: queryKeys.sales.dashboard,
     queryFn: fetchSalesDashboard,
+    refetchInterval: 60_000,
   });
 
   if (isPending) return <DashboardSkeleton />;

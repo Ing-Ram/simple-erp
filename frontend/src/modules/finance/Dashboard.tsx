@@ -48,6 +48,7 @@ export function FinanceDashboard() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: queryKeys.finance.dashboard,
     queryFn: fetchFinanceDashboard,
+    refetchInterval: 60_000,
   });
 
   if (isPending) return <DashboardSkeleton />;

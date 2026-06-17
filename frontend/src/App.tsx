@@ -96,6 +96,8 @@ export function App() {
             <Route path="all" element={<ProjectsPage />} />
             <Route path="all/:id" element={<ProjectDetailPage />} />
           </Route>
+          {/* Unknown URLs fall back to the default module rather than a blank screen. */}
+          <Route path="*" element={<Navigate to="/finance" replace />} />
         </Routes>
       </main>
     </div>

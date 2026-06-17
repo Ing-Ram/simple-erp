@@ -19,6 +19,7 @@ export function HrDashboard() {
   const { data, isPending, isError, refetch } = useQuery({
     queryKey: queryKeys.hr.dashboard,
     queryFn: fetchHrDashboard,
+    refetchInterval: 60_000,
   });
 
   const invalidate = () => queryClient.invalidateQueries({ queryKey: queryKeys.hr.dashboard });
