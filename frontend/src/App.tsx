@@ -1,5 +1,8 @@
-import { NavLink, Navigate, Route, Routes } from "react-router-dom";
+import { NavLink, Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { moduleAccent, type ModuleKey } from "./lib/tokens";
+import { RequireAuth, useAuth } from "./lib/auth";
+import { LoginPage } from "./modules/auth/LoginPage";
+import { HomePage } from "./modules/home/HomePage";
 import { FinanceLayout } from "./modules/finance/FinanceLayout";
 import { FinanceDashboard } from "./modules/finance/Dashboard";
 import { InvoicesPage } from "./modules/finance/InvoicesPage";
@@ -34,9 +37,12 @@ const MODULES: { key: ModuleKey; label: string; path: string }[] = [
 
 /** Left-rail navigation; the active module is underlined in its accent color. */
 function Nav() {
+  const { user, logout } = useAuth();
   return (
-    <nav className="flex flex-col gap-1 p-4">
-      <div className="mb-4 px-2 text-sm font-semibold tracking-tight text-neutral-900">SimpleERP</div>
+    <nav className="flex h-full flex-col gap-1 p-4">
+      <NavLink to="/" className="mb-4 px-2 text-sm font-semibold tracking-tight text-neutral-900">
+        SimpleERP
+      </NavLink>
       {MODULES.map((m) => (
         <NavLink
           key={m.key}
@@ -53,20 +59,46 @@ function Nav() {
           {m.label}
         </NavLink>
       ))}
+      <div className="mt-auto border-t border-neutral-200 pt-3">
+        <div className="px-2 text-sm text-neutral-700">{user?.displayName}</div>
+        <button
+          onClick={logout}
+          className="mt-1 px-2 text-sm font-medium text-neutral-500 hover:text-neutral-900"
+        >
+          Sign out
+        </button>
+      </div>
     </nav>
   );
 }
 
-/** App shell: persistent module nav beside the routed dashboard. */
-export function App() {
+/** Authenticated shell: persistent nav beside the routed page. */
+function AppShell() {
   return (
     <div className="flex min-h-screen">
       <aside className="w-48 shrink-0 border-r border-neutral-200 bg-white">
         <Nav />
       </aside>
       <main className="flex-1 p-8">
-        <Routes>
-          <Route path="/" element={<Navigate to="/finance" replace />} />
+        <Outlet />
+      </main>
+    </div>
+  );
+}
+
+/** Routes: a public login page; everything else lives behind auth in the app shell. */
+export function App() {
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        element={
+          <RequireAuth>
+            <AppShell />
+          </RequireAuth>
+        }
+      >
+          <Route path="/" element={<HomePage />} />
           <Route path="/finance" element={<FinanceLayout />}>
             <Route index element={<FinanceDashboard />} />
             <Route path="invoices" element={<InvoicesPage />} />
@@ -96,10 +128,9 @@ export function App() {
             <Route path="all" element={<ProjectsPage />} />
             <Route path="all/:id" element={<ProjectDetailPage />} />
           </Route>
-          {/* Unknown URLs fall back to the default module rather than a blank screen. */}
-          <Route path="*" element={<Navigate to="/finance" replace />} />
-        </Routes>
-      </main>
-    </div>
+          {/* Unknown URLs fall back to the home page rather than a blank screen. */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+      </Route>
+    </Routes>
   );
 }

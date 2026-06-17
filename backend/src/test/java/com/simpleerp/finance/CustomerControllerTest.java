@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -17,10 +18,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 /** Web-layer tests for the customer controller: list, create happy path, and validation failure. */
 @WebMvcTest(CustomerController.class)
+@AutoConfigureMockMvc(addFilters = false) // exercise controller logic without the JWT security filter
 class CustomerControllerTest {
 
     @Autowired private MockMvc mvc;
     @MockitoBean private CustomerService service;
+    // The security filter is disabled here, but its bean still needs its collaborators present.
+    @MockitoBean private com.simpleerp.auth.JwtService jwtService;
+    @MockitoBean private com.simpleerp.auth.AppUserDetailsService appUserDetailsService;
 
     @Test
     void listReturnsCustomers() throws Exception {

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -23,10 +24,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 /** Web-layer tests for the invoice controller: happy path, validation failure, and not-found. */
 @WebMvcTest(InvoiceController.class)
+@AutoConfigureMockMvc(addFilters = false) // exercise controller logic without the JWT security filter
 class InvoiceControllerTest {
 
     @Autowired private MockMvc mvc;
     @MockitoBean private InvoiceService service;
+    // The security filter is disabled here, but its bean still needs its collaborators present.
+    @MockitoBean private com.simpleerp.auth.JwtService jwtService;
+    @MockitoBean private com.simpleerp.auth.AppUserDetailsService appUserDetailsService;
 
     @Test
     void createReturns201WithLocation() throws Exception {

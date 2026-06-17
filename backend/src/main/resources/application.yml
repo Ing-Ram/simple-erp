@@ -22,6 +22,13 @@ spring:
 server:
   port: 8080
 
+# Authentication. The dev secret is fine for local use; override in prod via SIMPLEERP_AUTH_JWT_SECRET
+# (must be at least 32 bytes for HS256). Tokens live for 12 hours by default.
+simpleerp:
+  auth:
+    jwt-secret: ${SIMPLEERP_AUTH_JWT_SECRET:dev-only-secret-change-me-0123456789-abcdef}
+    jwt-ttl: PT12H
+
 ---
 # Production profile: PostgreSQL. Activate with SPRING_PROFILES_ACTIVE=prod.
 spring:
