@@ -4,6 +4,8 @@ import com.simpleerp.hr.dto.EmployeeRequest;
 import com.simpleerp.hr.dto.EmployeeResponse;
 import com.simpleerp.shared.Money;
 import com.simpleerp.shared.NotFoundException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -75,5 +77,23 @@ public class EmployeeService {
     @Transactional(readOnly = true)
     public Employee require(Long id) {
         return employees.findById(id).orElseThrow(() -> new NotFoundException("Employee", id));
+    }
+
+    /**
+     * The employee's fully-loaded hourly cost, derived from salary ÷ 2080 (40 hours × 52 weeks).
+     * The Projects module multiplies this by hours logged to get actual project cost — salary lives
+     * only here and is never copied into another module.
+     */
+    @Transactional(readOnly = true)
+    public Money hourlyCost(Long id) {
+        Money salary = require(id).getSalary();
+        return new Money(salary.getAmount().divide(BigDecimal.valueOf(2080), 2, RoundingMode.HALF_UP),
+                salary.getCurrency());
+    }
+
+    /** Count of currently-employed people, for cross-module capacity/utilization math. */
+    @Transactional(readOnly = true)
+    public long activeHeadcount() {
+        return employees.countByTerminationDateIsNull();
     }
 }

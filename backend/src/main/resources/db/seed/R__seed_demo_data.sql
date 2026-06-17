@@ -22,6 +22,11 @@ delete from sales_order_lines;
 delete from sales_orders;
 delete from opportunities;
 delete from leads;
+-- Projects (children before parents).
+delete from time_entries;
+delete from tasks;
+delete from milestones;
+delete from projects;
 
 -- Customers (AR) --------------------------------------------------------------
 insert into customers (id, name, email, payment_terms_days, active, created_at, updated_at) values
@@ -139,6 +144,44 @@ insert into sales_order_lines (id, order_id, description, quantity, unit_price_a
     (1, 1, 'Won opportunity #4', 1, 45000.0000, 'USD', timestamp '2026-06-05 09:00:00', timestamp '2026-06-05 09:00:00'),
     (2, 2, 'Won opportunity #6', 1, 60000.0000, 'USD', timestamp '2026-04-10 09:00:00', timestamp '2026-04-10 09:00:00');
 
+-- Projects: 3 active (one over budget, one at-risk, one on-track) + 1 completed. Spend is derived
+-- from time entries × each assignee's HR hourly cost (salary ÷ 2080), so budgets are demo-sized.
+insert into projects
+    (id, name, customer_id, manager_employee_id, start_date, target_end_date,
+     budget_amount, budget_currency, status, created_at, updated_at) values
+    (1, 'Website Redesign', 1,    1, date '2026-04-01', date '2026-08-31', 4000.0000, 'USD', 'ACTIVE',    timestamp '2026-04-01 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (2, 'Internal Tooling', null, 1, date '2026-05-01', date '2026-06-10', 2000.0000, 'USD', 'ACTIVE',    timestamp '2026-05-01 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (3, 'Data Migration',   3,    4, date '2026-05-15', date '2026-09-30', 8000.0000, 'USD', 'ACTIVE',    timestamp '2026-05-15 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (4, 'Legacy Sunset',    null, 5, date '2026-03-01', date '2026-05-01', 3000.0000, 'USD', 'COMPLETED', timestamp '2026-03-01 09:00:00', timestamp '2026-05-02 09:00:00');
+
+insert into tasks
+    (id, project_id, title, assignee_employee_id, status, due_date, estimate_hours, created_at, updated_at) values
+    (1, 1, 'Design mockups', 7, 'IN_PROGRESS', date '2026-06-20', 40.00, timestamp '2026-04-05 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (2, 1, 'Frontend build', 2, 'TODO',        date '2026-06-10', 80.00, timestamp '2026-04-05 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (3, 2, 'Build CLI',      7, 'IN_PROGRESS', date '2026-06-05', 30.00, timestamp '2026-05-02 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (4, 3, 'Migrate schema', 2, 'TODO',        date '2026-07-15', 50.00, timestamp '2026-05-16 09:00:00', timestamp '2026-06-01 09:00:00'),
+    (5, 4, 'Decommission',   5, 'DONE',        date '2026-04-20', 20.00, timestamp '2026-03-05 09:00:00', timestamp '2026-04-26 09:00:00');
+
+insert into milestones (id, project_id, name, due_date, completed_at, waived, created_at, updated_at) values
+    (1, 1, 'Design sign-off', date '2026-06-25', null,                            false, timestamp '2026-04-05 09:00:00', timestamp '2026-04-05 09:00:00'),
+    (2, 1, 'Launch',          date '2026-08-20', null,                            false, timestamp '2026-04-05 09:00:00', timestamp '2026-04-05 09:00:00'),
+    (3, 2, 'MVP',             date '2026-06-08', null,                            false, timestamp '2026-05-02 09:00:00', timestamp '2026-05-02 09:00:00'),
+    (4, 3, 'Cutover',         date '2026-09-01', null,                            false, timestamp '2026-05-16 09:00:00', timestamp '2026-05-16 09:00:00'),
+    (5, 4, 'Shutdown',        date '2026-04-28', timestamp '2026-04-28 09:00:00', false, timestamp '2026-03-05 09:00:00', timestamp '2026-04-28 09:00:00');
+
+-- Time entries drive actual spend. Dates within ~30 days feed utilization; 6/15–6/16 are "this week".
+insert into time_entries (id, task_id, employee_id, entry_date, hours, note, created_at, updated_at) values
+    (1,  1, 7, date '2026-05-20', 16.00, 'Wireframes',     timestamp '2026-05-20 18:00:00', timestamp '2026-05-20 18:00:00'),
+    (2,  1, 7, date '2026-06-15', 16.00, 'High-fidelity',  timestamp '2026-06-15 18:00:00', timestamp '2026-06-15 18:00:00'),
+    (3,  2, 2, date '2026-05-22', 16.00, 'Scaffolding',    timestamp '2026-05-22 18:00:00', timestamp '2026-05-22 18:00:00'),
+    (4,  2, 2, date '2026-06-16', 16.00, 'Components',     timestamp '2026-06-16 18:00:00', timestamp '2026-06-16 18:00:00'),
+    (5,  3, 7, date '2026-05-25', 16.00, 'CLI parser',     timestamp '2026-05-25 18:00:00', timestamp '2026-05-25 18:00:00'),
+    (6,  3, 7, date '2026-06-01', 16.00, 'Commands',       timestamp '2026-06-01 18:00:00', timestamp '2026-06-01 18:00:00'),
+    (7,  3, 7, date '2026-06-15', 16.00, 'Polish',         timestamp '2026-06-15 18:00:00', timestamp '2026-06-15 18:00:00'),
+    (8,  4, 2, date '2026-06-02', 12.00, 'Schema audit',   timestamp '2026-06-02 18:00:00', timestamp '2026-06-02 18:00:00'),
+    (9,  4, 2, date '2026-06-10', 12.00, 'ETL draft',      timestamp '2026-06-10 18:00:00', timestamp '2026-06-10 18:00:00'),
+    (10, 5, 5, date '2026-04-25', 16.00, 'Final teardown', timestamp '2026-04-25 18:00:00', timestamp '2026-04-25 18:00:00');
+
 -- Advance identity sequences past the seeded ids so app-created rows don't collide.
 alter table customers      alter column id restart with 100;
 alter table vendors        alter column id restart with 100;
@@ -156,3 +199,7 @@ alter table leads             alter column id restart with 100;
 alter table opportunities     alter column id restart with 100;
 alter table sales_orders      alter column id restart with 100;
 alter table sales_order_lines alter column id restart with 100;
+alter table projects          alter column id restart with 100;
+alter table tasks             alter column id restart with 100;
+alter table milestones        alter column id restart with 100;
+alter table time_entries      alter column id restart with 100;
