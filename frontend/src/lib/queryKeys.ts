@@ -26,5 +26,11 @@ export const queryKeys = {
     reps: (period: string) => ["sales", "reps", period] as const,
     closedDeals: (ownerId: number | "all") => ["sales", "closed-deals", ownerId] as const,
   },
-  projects: { dashboard: ["projects", "dashboard"] as const },
+  projects: {
+    dashboard: ["projects", "dashboard"] as const,
+    list: ["projects", "list"] as const,
+    project: (id: number) => ["projects", id] as const,
+    tasks: (projectId: number) => ["projects", projectId, "tasks"] as const,
+    milestones: (projectId: number) => ["projects", projectId, "milestones"] as const,
+  },
 };

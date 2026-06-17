@@ -20,7 +20,10 @@ import { OpportunitiesPage } from "./modules/sales/OpportunitiesPage";
 import { OrdersPage } from "./modules/sales/OrdersPage";
 import { RepsPage } from "./modules/sales/RepsPage";
 import { ClosedDealsPage } from "./modules/sales/ClosedDealsPage";
+import { ProjectsLayout } from "./modules/projects/ProjectsLayout";
 import { ProjectsDashboard } from "./modules/projects/Dashboard";
+import { ProjectsPage } from "./modules/projects/ProjectsPage";
+import { ProjectDetailPage } from "./modules/projects/ProjectDetailPage";
 
 const MODULES: { key: ModuleKey; label: string; path: string }[] = [
   { key: "finance", label: "Finance", path: "/finance" },
@@ -88,7 +91,11 @@ export function App() {
             <Route path="reps" element={<RepsPage />} />
             <Route path="closed" element={<ClosedDealsPage />} />
           </Route>
-          <Route path="/projects" element={<ProjectsDashboard />} />
+          <Route path="/projects" element={<ProjectsLayout />}>
+            <Route index element={<ProjectsDashboard />} />
+            <Route path="all" element={<ProjectsPage />} />
+            <Route path="all/:id" element={<ProjectDetailPage />} />
+          </Route>
         </Routes>
       </main>
     </div>
