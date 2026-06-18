@@ -23,6 +23,26 @@ turnover) and exhaustive status switches so a new state is a compile error. The 
 behind login (see [Authentication](#authentication)), opening on a home landing page with a
 headline KPI per module.
 
+## Screenshots
+
+The story, end to end — sign in, land on the cross-module snapshot, then drill into each module.
+
+| | |
+|---|---|
+| **Sign in** — stateless JWT auth | **Home** — one headline KPI per module |
+| ![Login](docs/screenshots/01-login.png) | ![Home](docs/screenshots/02-home.png) |
+| **Finance** — AR/AP aging, cash flow, what needs attention | **Invoices** — list & lifecycle |
+| ![Finance dashboard](docs/screenshots/03-finance.png) | ![Invoices](docs/screenshots/04-finance-invoices.png) |
+| **HR** — headcount, hiring, turnover | **Roll call** — emergency check-in/out |
+| ![HR dashboard](docs/screenshots/05-hr.png) | ![Roll call](docs/screenshots/06-hr-roll-call.png) |
+| **Sales** — weighted pipeline & stages | **Reps** — salesperson attribution leaderboard |
+| ![Sales dashboard](docs/screenshots/07-sales.png) | ![Sales reps](docs/screenshots/08-sales-reps.png) |
+| **Projects** — utilization & budget health | **Users** — admin-only account management |
+| ![Projects dashboard](docs/screenshots/09-projects.png) | ![Users](docs/screenshots/10-users.png) |
+
+> Regenerate after UI changes: with the dev app running (`:5173` + `:8080`), run
+> `node frontend/scripts/capture-screenshots.mjs`.
+
 ## Cross-module seams
 
 Modules never touch each other's tables — only published service interfaces:
