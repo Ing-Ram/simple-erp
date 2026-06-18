@@ -3,6 +3,7 @@ import { moduleAccent, type ModuleKey } from "./lib/tokens";
 import { RequireAuth, useAuth } from "./lib/auth";
 import { LoginPage } from "./modules/auth/LoginPage";
 import { HomePage } from "./modules/home/HomePage";
+import { UsersPage } from "./modules/admin/UsersPage";
 import { FinanceLayout } from "./modules/finance/FinanceLayout";
 import { FinanceDashboard } from "./modules/finance/Dashboard";
 import { InvoicesPage } from "./modules/finance/InvoicesPage";
@@ -59,8 +60,21 @@ function Nav() {
           {m.label}
         </NavLink>
       ))}
+      {user?.role === "ADMIN" && (
+        <NavLink
+          to="/users"
+          className={({ isActive }) =>
+            `mt-2 rounded px-2 py-1.5 text-sm font-medium ${
+              isActive ? "bg-neutral-100 text-neutral-900" : "text-neutral-500 hover:text-neutral-900"
+            }`
+          }
+        >
+          Users
+        </NavLink>
+      )}
       <div className="mt-auto border-t border-neutral-200 pt-3">
         <div className="px-2 text-sm text-neutral-700">{user?.displayName}</div>
+        <div className="px-2 text-xs text-neutral-400">{user?.role?.toLowerCase()}</div>
         <button
           onClick={logout}
           className="mt-1 px-2 text-sm font-medium text-neutral-500 hover:text-neutral-900"
@@ -70,6 +84,12 @@ function Nav() {
       </div>
     </nav>
   );
+}
+
+/** Restricts a route to admins; non-admins are sent home. */
+function AdminRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  return user?.role === "ADMIN" ? <>{children}</> : <Navigate to="/" replace />;
 }
 
 /** Authenticated shell: persistent nav beside the routed page. */
@@ -128,6 +148,7 @@ export function App() {
             <Route path="all" element={<ProjectsPage />} />
             <Route path="all/:id" element={<ProjectDetailPage />} />
           </Route>
+          <Route path="/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
           {/* Unknown URLs fall back to the home page rather than a blank screen. */}
           <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

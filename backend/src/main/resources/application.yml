@@ -42,3 +42,10 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/simpleerp}
     username: ${DATABASE_USER:simpleerp}
     password: ${DATABASE_PASSWORD:}
+
+# Bootstrap the first admin in production from the environment (created once if absent). Leave unset
+# to skip — but then a fresh database has no way to sign in until a user is added another way.
+simpleerp:
+  auth:
+    bootstrap-admin-username: ${SIMPLEERP_ADMIN_USERNAME:}
+    bootstrap-admin-password: ${SIMPLEERP_ADMIN_PASSWORD:}

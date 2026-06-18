@@ -11,6 +11,9 @@ export const queryKeys = {
     customers: ["finance", "customers"] as const,
     vendors: ["finance", "vendors"] as const,
   },
+  admin: {
+    users: ["admin", "users"] as const,
+  },
   hr: {
     dashboard: ["hr", "dashboard"] as const,
     rollCall: ["hr", "roll-call"] as const,
